@@ -24,7 +24,7 @@ html_template = '''
         <button type="submit">Submit</button>
     </form>
     {% if name and age is not none %}
-        <h2>Hello, {{ name }}! You are {{ age }} years old.</h2>
+        <h2>Hello, {{ name }}! You were born on {{ day_of_week }} </h2>
     {% endif %}
 </body>
 </html>
@@ -33,18 +33,18 @@ html_template = '''
 @app.route('/', methods=['GET', 'POST'])
 def home():
     name = None
-    age = None
+    day_of_week = None
     if request.method == 'POST':
         name = request.form['name']
         birthdate = request.form['birthdate']
+
         try:
-            # Introduce a deliberate bug by using an incorrect date format
-            birthdate = datetime.strptime(birthdate, '%d-%m-%Y')  # Incorrect format
-            today = datetime.today()
-            age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+            birthdate = datetime.strptime(birthdate, '%Y-%m-%d')  # Correct format
+            day_of_week = birthdate.strftime('%A')  # Get the day of the week
         except ValueError:
-            age = "Invalid date format. Please enter the date in YYYY-MM-DD format."
-    return render_template_string(html_template, name=name, age=age)
+            day_of_week = "Invalid date format. Please enter the date in YYYY-MM-DD format."
+    return render_template_string(html_template, name=name, day_of_week=day_of_week)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
